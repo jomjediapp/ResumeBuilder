@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Applicant Resume Builder</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">RB</div>
+          <div>
+            <h1>Resume Builder</h1>
+            <p>Fill in your details and shape a ready-to-send resume.</p>
+          </div>
+        </div>
+
+        <div class="steps" aria-label="Resume sections">
+          <button class="step is-active" data-target="aiImport">AI import</button>
+          <button class="step" data-target="personal">Profile</button>
+          <button class="step" data-target="experience">Experience</button>
+          <button class="step" data-target="education">Education</button>
+          <button class="step" data-target="skills">Skills</button>
+          <button class="step" data-target="collect">Collect</button>
+          <button class="step" data-target="style">Style</button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <section class="form-panel" aria-label="Resume details form">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Applicant details</p>
+              <h2>Build your resume</h2>
+            </div>
+            <div class="actions">
+              <button type="button" class="ghost-button" id="loadSample">Sample</button>
+              <button type="button" class="ghost-button" id="clearForm">Clear</button>
+              <button type="button" class="primary-button" id="printResume">Print</button>
+            </div>
+          </div>
+
+          <form id="resumeForm">
+            <fieldset class="form-section" id="aiImport">
+              <legend>AI import</legend>
+              <div class="ai-import">
+                <label>
+                  OpenAI API key
+                  <input id="apiKey" type="password" autocomplete="off" placeholder="sk-...">
+                </label>
+                <label>
+                  Model
+                  <input id="aiModel" type="text" value="gpt-5" placeholder="gpt-5">
+                </label>
+                <label class="wide">
+                  Upload resume file or image
+                  <input id="resumeUpload" type="file" accept=".pdf,.doc,.docx,.txt,.md,.rtf,.json,.csv,.png,.jpg,.jpeg,.webp,image/*,application/pdf">
+                </label>
+                <label class="wide">
+                  Or paste existing resume text
+                  <textarea id="resumeTextImport" rows="5" placeholder="Paste resume text here if you do not have a file ready."></textarea>
+                </label>
+              </div>
+              <div class="import-actions">
+                <button type="button" class="primary-button" id="extractWithAi">Extract with AI</button>
+                <button type="button" class="ghost-button" id="extractFromText">Use pasted text</button>
+                <span id="aiStatus">Your API key is used only for this extraction request.</span>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section" id="personal">
+              <legend>Profile</legend>
+              <div class="grid two">
+                <label>
+                  Full name
+                  <input name="fullName" type="text" placeholder="Alex Morgan">
+                </label>
+                <label>
+                  Job title
+                  <input name="jobTitle" type="text" placeholder="Product Designer">
+                </label>
+                <label>
+                  Email
+                  <input name="email" type="email" placeholder="alex@example.com">
+                </label>
+                <label>
+                  Phone
+                  <input name="phone" type="tel" placeholder="+1 555 0100">
+                </label>
+                <label>
+                  Location
+                  <input name="location" type="text" placeholder="Austin, TX">
+                </label>
+                <label>
+                  Portfolio or LinkedIn
+                  <input name="website" type="url" placeholder="https://linkedin.com/in/alex">
+                </label>
+              </div>
+              <label>
+                Professional summary
+                <textarea name="summary" rows="5" placeholder="Write a concise summary of your strongest experience, impact, and target role."></textarea>
+              </label>
+            </fieldset>
+
+            <fieldset class="form-section" id="experience">
+              <div class="section-title-row">
+                <legend>Experience</legend>
+                <button type="button" class="icon-button" id="addExperience" aria-label="Add experience">+</button>
+              </div>
+              <div id="experienceList" class="repeat-list"></div>
+            </fieldset>
+
+            <fieldset class="form-section" id="education">
+              <div class="section-title-row">
+                <legend>Education</legend>
+                <button type="button" class="icon-button" id="addEducation" aria-label="Add education">+</button>
+              </div>
+              <div id="educationList" class="repeat-list"></div>
+            </fieldset>
+
+            <fieldset class="form-section" id="skills">
+              <legend>Skills</legend>
+              <label>
+                Core skills
+                <textarea name="skills" rows="4" placeholder="UX research, wireframing, stakeholder management, Figma"></textarea>
+              </label>
+              <label>
+                Certifications, awards, or languages
+                <textarea name="extras" rows="4" placeholder="Certified ScrumMaster, Spanish, Best Portfolio Award"></textarea>
+              </label>
+            </fieldset>
+
+            <fieldset class="form-section" id="collect">
+              <legend>Collect data</legend>
+              <div class="sheet-settings">
+                <label class="wide">
+                  Google Apps Script web app URL
+                  <input id="sheetEndpoint" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+                </label>
+                <label class="checkbox-label wide">
+                  <input id="sheetConsent" type="checkbox">
+                  Applicant agrees to submit resume details for review
+                </label>
+              </div>
+              <div class="import-actions">
+                <button type="button" class="primary-button" id="sendToSheet">Send to Google Sheet</button>
+                <span id="sheetStatus">Submissions are sent only when this button is clicked.</span>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section" id="style">
+              <legend>Style</legend>
+              <div class="style-controls">
+                <label>
+                  Accent color
+                  <input name="accentColor" type="color" value="#1e6f5c">
+                </label>
+                <label class="checkbox-label">
+                  <input name="compactMode" type="checkbox">
+                  Compact layout
+                </label>
+              </div>
+            </fieldset>
+          </form>
+        </section>
+
+        <section class="preview-panel" aria-label="Resume preview">
+          <div class="preview-toolbar">
+            <div>
+              <p class="eyebrow">Live preview</p>
+              <h2>Resume</h2>
+            </div>
+            <span id="saveStatus">Saved locally</span>
+          </div>
+
+          <article class="resume-page" id="resumePreview">
+            <header class="resume-header">
+              <div>
+                <h2 data-preview="fullName">Your Name</h2>
+                <p data-preview="jobTitle">Target role</p>
+              </div>
+              <ul class="contact-list" id="previewContact"></ul>
+            </header>
+
+            <section class="resume-section" data-section="summary">
+              <h3>Profile</h3>
+              <p data-preview="summary">Add a short professional summary to introduce your experience and goals.</p>
+            </section>
+
+            <section class="resume-section" data-section="experience">
+              <h3>Experience</h3>
+              <div id="previewExperience"></div>
+            </section>
+
+            <section class="resume-section" data-section="education">
+              <h3>Education</h3>
+              <div id="previewEducation"></div>
+            </section>
+
+            <section class="resume-section" data-section="skills">
+              <h3>Skills</h3>
+              <div class="skill-tags" id="previewSkills"></div>
+            </section>
+
+            <section class="resume-section" data-section="extras">
+              <h3>Additional</h3>
+              <p data-preview="extras"></p>
+            </section>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <template id="experienceTemplate">
+      <div class="repeat-item" data-kind="experience">
+        <div class="repeat-header">
+          <strong>Role</strong>
+          <button type="button" class="remove-button">Remove</button>
+        </div>
+        <div class="grid two">
+          <label>
+            Job title
+            <input data-field="title" type="text" placeholder="Product Designer">
+          </label>
+          <label>
+            Company
+            <input data-field="company" type="text" placeholder="Acme Studio">
+          </label>
+          <label>
+            Start
+            <input data-field="start" type="text" placeholder="Jan 2023">
+          </label>
+          <label>
+            End
+            <input data-field="end" type="text" placeholder="Present">
+          </label>
+        </div>
+        <label>
+          Highlights
+          <textarea data-field="details" rows="4" placeholder="Use one achievement per line. Include numbers where possible."></textarea>
+        </label>
+      </div>
+    </template>
+
+    <template id="educationTemplate">
+      <div class="repeat-item" data-kind="education">
+        <div class="repeat-header">
+          <strong>School</strong>
+          <button type="button" class="remove-button">Remove</button>
+        </div>
+        <div class="grid two">
+          <label>
+            Degree or program
+            <input data-field="degree" type="text" placeholder="B.S. Computer Science">
+          </label>
+          <label>
+            Institution
+            <input data-field="school" type="text" placeholder="State University">
+          </label>
+          <label>
+            Year
+            <input data-field="year" type="text" placeholder="2022">
+          </label>
+          <label>
+            Location
+            <input data-field="place" type="text" placeholder="Boston, MA">
+          </label>
+        </div>
+      </div>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
